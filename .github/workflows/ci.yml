@@ -34,7 +34,7 @@ run: npm install -g eslint
 - name: Lint JavaScript
 run: eslint frontend/app.js --env node --env es6 --parser-options=ecmaVersion:2020
 
-- name: Lint Dockerfiles
+- name: Lint API Dockerfile
 uses: hadolint/hadolint-action@v3.1.0
 with:
 dockerfile: api/Dockerfile
@@ -61,12 +61,10 @@ with:
 python-version: '3.11'
 
 - name: Install dependencies
-run: |
-pip install fastapi uvicorn redis pytest pytest-cov httpx
+run: pip install fastapi uvicorn redis pytest pytest-cov httpx
 
 - name: Run tests
-run: |
-pytest api/tests/ --cov=api --cov-report=xml
+run: pytest api/tests/ --cov=api --cov-report=xml
 
 - name: Upload coverage report
 uses: actions/upload-artifact@v3
@@ -127,7 +125,7 @@ image-ref: localhost:5000/api:latest
 format: sarif
 output: api-trivy.sarif
 severity: CRITICAL
-exit-code: 1
+exit-code: '1'
 
 - name: Scan worker image
 uses: aquasecurity/trivy-action@master
@@ -136,7 +134,7 @@ image-ref: localhost:5000/worker:latest
 format: sarif
 output: worker-trivy.sarif
 severity: CRITICAL
-exit-code: 1
+exit-code: '1'
 
 - name: Scan frontend image
 uses: aquasecurity/trivy-action@master
@@ -145,7 +143,7 @@ image-ref: localhost:5000/frontend:latest
 format: sarif
 output: frontend-trivy.sarif
 severity: CRITICAL
-exit-code: 1
+exit-code: '1'
 
 - name: Upload SARIF results
 uses: actions/upload-artifact@v3
@@ -200,5 +198,4 @@ timeout 60 bash -c 'until curl -sf http://localhost:8000/health; do sleep 2; don
 docker compose up -d --no-deps --build worker
 docker compose up -d --no-deps --build frontend
 timeout 60 bash -c 'until curl -sf http://localhost:3000/health; do sleep 2; done'
-
 
