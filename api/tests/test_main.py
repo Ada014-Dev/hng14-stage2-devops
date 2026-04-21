@@ -11,10 +11,12 @@ from main import app
 
 client = TestClient(app)
 
+
 def test_health_check():
 response = client.get("/health")
 assert response.status_code == 200
 assert response.json() == {"status": "ok"}
+
 
 def test_create_job():
 with patch('main.r') as mock_r:
@@ -24,10 +26,10 @@ response = client.post("/jobs")
 assert response.status_code == 200
 assert "job_id" in response.json()
 
+
 def test_get_job_not_found():
 with patch('main.r') as mock_r:
 mock_r.hget = MagicMock(return_value=None)
 response = client.get("/jobs/fake-id")
 assert response.status_code == 200
 assert response.json() == {"error": "not found"}
-
