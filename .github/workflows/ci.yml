@@ -26,7 +26,7 @@ jobs:
       - name: Install eslint
         run: npm install -g eslint
       - name: Lint JavaScript
-        run: eslint frontend/app.js --env node --env es6
+        run: eslint frontend/app.js
       - name: Lint API Dockerfile
         uses: hadolint/hadolint-action@v3.1.0
         with:
