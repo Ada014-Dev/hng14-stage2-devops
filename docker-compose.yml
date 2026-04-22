@@ -1,73 +1,80 @@
-version: '3.8'
-
-services:
-redis:
-image: redis:7-alpine
-networks:
-- internal
-healthcheck:
-test: ["CMD", "redis-cli", "ping"]
-interval: 30s
-timeout: 10s
-retries: 3
-deploy:
-resources:
-limits:
-cpus: '0.5'
-memory: 128M
-
-api:
-build: ./api
-environment:
-- REDIS_URL=redis://redis:6379
-networks:
-- internal
-depends_on:
-redis:
-condition: service_healthy
-healthcheck:
-test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-interval: 30s
-timeout: 10s
-retries: 3
-deploy:
-resources:
-limits:
-cpus: '0.5'
-memory: 256M
-
-worker:
-build: ./worker
-environment:
-- REDIS_URL=redis://redis:6379
-networks:
-- internal
-depends_on:
-redis:
-condition: service_healthy
-deploy:
-resources:
-limits:
-cpus: '0.5'
-memory: 256M
-
-frontend:
-build: ./frontend
-environment:
-- API_URL=http://api:8000
-ports:
-- "3000:3000"
-networks:
-- internal
-depends_on:
-api:
-condition: service_healthy
-deploy:
-resources:
-limits:
-cpus: '0.5'
-memory: 256M
-
-networks:
-internal:
-driver: bridge
+python3 -c "
+lines = [
+'version: \"3.8\"\n',
+'\n',
+'services:\n',
+' redis:\n',
+' image: redis:7-alpine\n',
+' networks:\n',
+' - internal\n',
+' healthcheck:\n',
+' test: [\"CMD\", \"redis-cli\", \"ping\"]\n',
+' interval: 30s\n',
+' timeout: 10s\n',
+' retries: 3\n',
+' deploy:\n',
+' resources:\n',
+' limits:\n',
+' cpus: \"0.5\"\n',
+' memory: 128M\n',
+'\n',
+' api:\n',
+' build: ./api\n',
+' environment:\n',
+' - REDIS_URL=redis://redis:6379\n',
+' networks:\n',
+' - internal\n',
+' depends_on:\n',
+' redis:\n',
+' condition: service_healthy\n',
+' healthcheck:\n',
+' test: [\"CMD\", \"curl\", \"-f\", \"http://localhost:8000/health\"]\n',
+' interval: 30s\n',
+' timeout: 10s\n',
+' retries: 3\n',
+' deploy:\n',
+' resources:\n',
+' limits:\n',
+' cpus: \"0.5\"\n',
+' memory: 256M\n',
+'\n',
+' worker:\n',
+' build: ./worker\n',
+' environment:\n',
+' - REDIS_URL=redis://redis:6379\n',
+' networks:\n',
+' - internal\n',
+' depends_on:\n',
+' redis:\n',
+' condition: service_healthy\n',
+' deploy:\n',
+' resources:\n',
+' limits:\n',
+' cpus: \"0.5\"\n',
+' memory: 256M\n',
+'\n',
+' frontend:\n',
+' build: ./frontend\n',
+' environment:\n',
+' - API_URL=http://api:8000\n',
+' ports:\n',
+' - \"3000:3000\"\n',
+' networks:\n',
+' - internal\n',
+' depends_on:\n',
+' api:\n',
+' condition: service_healthy\n',
+' deploy:\n',
+' resources:\n',
+' limits:\n',
+' cpus: \"0.5\"\n',
+' memory: 256M\n',
+'\n',
+'networks:\n',
+' internal:\n',
+' driver: bridge\n',
+]
+with open('docker-compose.yml', 'w') as f:
+f.writelines(lines)
+print('Done!')
+"
