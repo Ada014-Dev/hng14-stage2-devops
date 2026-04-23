@@ -10,7 +10,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY . .
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
-RUN useradd -m appuser
+RUN adduser --disabled-password --gecos "" appuser
 USER appuser
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
