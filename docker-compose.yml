@@ -3,6 +3,7 @@ version: '3.8'
 services:
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     networks:
       - internal
     healthcheck:
@@ -18,6 +19,7 @@ services:
 
   api:
     build: ./api
+    restart: unless-stopped
     environment:
       - REDIS_URL=redis://redis:6379
     networks:
@@ -38,6 +40,7 @@ services:
 
   worker:
     build: ./worker
+    restart: unless-stopped
     environment:
       - REDIS_URL=redis://redis:6379
     networks:
@@ -53,6 +56,7 @@ services:
 
   frontend:
     build: ./frontend
+    restart: unless-stopped
     environment:
       - API_URL=http://api:8000
     ports:
